@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seating Chart - SeatPlan</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/header :: appHeader(${activeTab})}"></div>
+
+<main class="main-container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Exam Seating Chart</h1>
+            <p class="page-subtitle">Automated seat allocation with class/section separation</p>
+        </div>
+
+        <!-- Action Controls (Hidden when printing) -->
+        <div class="no-print" style="display: flex; gap: 10px;">
+            <form th:action="@{/seating/generate}" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-primary">⚡ Generate Seating</button>
+            </form>
+
+            <button type="button" id="printSeatingBtn" class="btn btn-secondary">🖨️ Print Seating Chart</button>
+
+            <form th:action="@{/seating/clear}" method="post" onsubmit="return confirm('Clear all seating allocations?')" style="display: inline;">
+                <button type="submit" class="btn btn-danger">🗑️ Clear Seating</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Alert Notifications -->
+    <div th:if="${successMessage}" class="alert alert-success no-print" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger no-print" th:text="${errorMessage}"></div>
+
+    <!-- Summary Bar -->
+    <div class="no-print" style="background: #ffffff; padding: 14px 20px; border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 25px; display: flex; justify-content: space-around; font-size: 14px; font-weight: 600;">
+        <div>Total Registered Students: <span style="color: var(--primary-dark);" th:text="${totalStudents}">0</span></div>
+        <div>Total Hall Capacity: <span style="color: var(--primary-dark);" th:text="${totalCapacity}">0</span></div>
+        <div>Allocated Seats: <span style="color: var(--primary-dark);" th:text="${totalAllocated}">0</span></div>
+    </div>
+
+    <!-- Empty State (No Halls) -->
+    <div th:if="${#lists.isEmpty(halls)}" class="table-card" style="padding: 40px; text-align: center; color: var(--text-secondary);">
+        <h3>No Exam Halls Registered</h3>
+        <p>Please register examination halls first under the <a th:href="@{/halls}">Exam Halls</a> tab.</p>
+    </div>
+
+    <!-- Empty State (No Students) -->
+    <div th:if="${!#lists.isEmpty(halls) && totalStudents == 0}" class="table-card" style="padding: 40px; text-align: center; color: var(--text-secondary);">
+        <h3>No Students Registered</h3>
+        <p>Please register students first under the <a th:href="@{/students}">Students</a> tab before generating seating.</p>
+    </div>
+
+    <!-- Empty State (Not Generated Yet) -->
+    <div th:if="${!#lists.isEmpty(halls) && totalStudents > 0 && totalAllocated == 0}" class="table-card" style="padding: 40px; text-align: center; color: var(--text-secondary);">
+        <h3>No Seating Arrangement Generated Yet</h3>
+        <p style="margin-bottom: 15px;">Click the <strong>⚡ Generate Seating</strong> button above to allocate students automatically.</p>
+    </div>
+
+    <!-- Seating Chart Hall Cards -->
+    <div th:each="hall : ${halls}" class="hall-chart-card">
+        <div class="hall-chart-header">
+            <div>
+                <h2 class="hall-name-title" th:text="${'HALL: ' + hall.hallName}">HALL A101</h2>
+                <span class="hall-meta" th:text="${hall.rows + ' Rows × ' + hall.columns + ' Columns | Capacity: ' + hall.capacity + ' Seats'}">5 Rows x 6 Columns</span>
+            </div>
+            <div class="no-print">
+                <span class="seat-class-badge" style="font-size: 13px;">Seating Layout</span>
+            </div>
+        </div>
+
+        <!-- Hall Dynamic Seating Grid -->
+        <div class="seating-grid" th:style="${'grid-template-columns: repeat(' + hall.columns + ', 1fr);'}">
+            <th:block th:each="r : ${#numbers.sequence(1, hall.rows)}">
+                <th:block th:each="c : ${#numbers.sequence(1, hall.columns)}">
+                    <th:block th:with="seatIndex=${(r - 1) * hall.columns + c}">
+                        <!-- Check if seat is within hall capacity limit -->
+                        <div th:if="${seatIndex <= hall.capacity}"
+                             th:with="key=${hall.id + '-' + r + '-' + c}, alloc=${hallSeatMap.get(key)}"
+                             class="seat-card"
+                             th:classappend="${alloc != null ? 'allocated' : 'empty'}">
+
+                            <div class="seat-no" th:text="${alloc != null ? alloc.seatNumber : hall.hallName + '-R' + r + '-C' + c}">A101-R1-C1</div>
+
+                            <div th:if="${alloc != null}">
+                                <div class="seat-student-name" th:text="${alloc.student.studentName}">Student Name</div>
+                                <div class="seat-reg-no" th:text="${alloc.student.registerNumber}">RegNo</div>
+                                <div class="seat-class-badge" th:text="${alloc.student.className + ' (' + alloc.student.section + ')'}">Class (A)</div>
+                            </div>
+
+                            <div th:if="${alloc == null}" class="empty-seat-text">
+                                Empty Seat
+                            </div>
+                        </div>
+                    </th:block>
+                </th:block>
+            </th:block>
+        </div>
+    </div>
+</main>
+
+<footer class="app-footer no-print">
+    <p>SeatPlan &mdash; Exam Hall Seating Arrangement Generator &copy; 2026</p>
+</footer>
+
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

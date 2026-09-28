@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SeatPlan</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<!-- Top Header Navigation with Top-Right SeatPlan Branding -->
+<div th:replace="~{fragments/header :: appHeader(${activeTab})}"></div>
+
+<main class="main-container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Administrator Dashboard</h1>
+            <p class="page-subtitle">Overview of examination halls, registered students, and seating status</p>
+        </div>
+    </div>
+
+    <!-- Summary Metrics Cards -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div>
+                <div class="metric-value" th:text="${totalHalls}">0</div>
+                <div class="metric-label">Total Exam Halls</div>
+            </div>
+            <div class="metric-icon">🏛️</div>
+        </div>
+
+        <div class="metric-card">
+            <div>
+                <div class="metric-value" th:text="${totalStudents}">0</div>
+                <div class="metric-label">Total Students</div>
+            </div>
+            <div class="metric-icon">👨‍🎓</div>
+        </div>
+
+        <div class="metric-card">
+            <div>
+                <div class="metric-value" th:text="${totalCapacity}">0</div>
+                <div class="metric-label">Total Seating Capacity</div>
+            </div>
+            <div class="metric-icon">🪑</div>
+        </div>
+
+        <div class="metric-card">
+            <div>
+                <div class="metric-value" th:text="${allocatedStudents}">0</div>
+                <div class="metric-label">Allocated Students</div>
+            </div>
+            <div class="metric-icon">✅</div>
+        </div>
+    </div>
+
+    <!-- Quick Action Navigation -->
+    <h2 style="font-size: 20px; font-weight: 700; color: var(--text-main); margin-bottom: 16px;">Quick Actions</h2>
+
+    <div class="actions-grid">
+        <a th:href="@{/halls}" class="action-card">
+            <div class="action-card-header">
+                <span style="font-size: 24px;">🏛️</span>
+                <span class="action-card-title">Manage Exam Halls</span>
+            </div>
+            <p class="action-card-desc">Register new examination halls, configure rows, columns, and capacity limits.</p>
+        </a>
+
+        <a th:href="@{/students}" class="action-card">
+            <div class="action-card-header">
+                <span style="font-size: 24px;">👨‍🎓</span>
+                <span class="action-card-title">Manage Students</span>
+            </div>
+            <p class="action-card-desc">Add, edit, or search registered students, assign class and section details.</p>
+        </a>
+
+        <a th:href="@{/seating}" class="action-card">
+            <div class="action-card-header">
+                <span style="font-size: 24px;">⚡</span>
+                <span class="action-card-title">Generate & View Seating</span>
+            </div>
+            <p class="action-card-desc">Run automatic seat allocation with class/section separation rules and view charts.</p>
+        </a>
+
+        <a th:href="@{/find-seat}" class="action-card">
+            <div class="action-card-header">
+                <span style="font-size: 24px;">🔍</span>
+                <span class="action-card-title">Find Student Seat</span>
+            </div>
+            <p class="action-card-desc">Quickly look up specific student seat allocations by register number.</p>
+        </a>
+    </div>
+</main>
+
+<footer class="app-footer">
+    <p>SeatPlan &mdash; Exam Hall Seating Arrangement Generator &copy; 2026</p>
+</footer>
+
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

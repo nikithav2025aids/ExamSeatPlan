@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Student Seat - SeatPlan</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/header :: appHeader(${activeTab})}"></div>
+
+<main class="main-container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Find Student Seat</h1>
+            <p class="page-subtitle">Search examinee hall allocation and assigned seat numbers</p>
+        </div>
+    </div>
+
+    <!-- Search Box -->
+    <div class="search-card" style="max-width: 650px; margin: 0 auto 30px auto;">
+        <form th:action="@{/find-seat}" method="get" style="display: flex; gap: 12px; align-items: flex-end;">
+            <div style="flex: 1;">
+                <label for="registerNumber" class="form-label">Enter Register Number</label>
+                <input type="text" id="registerNumber" name="registerNumber" th:value="${searchedRegNo}" class="form-control" placeholder="e.g. 23AIDS001" required autofocus>
+            </div>
+            <button type="submit" class="btn btn-primary">🔍 Find Seat</button>
+        </form>
+    </div>
+
+    <!-- Error / Info Alerts -->
+    <div th:if="${errorMessage}" class="alert alert-danger" style="max-width: 650px; margin: 0 auto;" th:text="${errorMessage}">
+        Student not found.
+    </div>
+
+    <div th:if="${infoMessage}" class="alert alert-info" style="max-width: 650px; margin: 0 auto;" th:text="${infoMessage}">
+        Seating has not been generated for this student yet.
+    </div>
+
+    <!-- Allocation Results Card -->
+    <div th:if="${allocation != null}" class="result-card">
+        <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--primary-light); padding-bottom: 12px;">
+            <span class="seat-class-badge" style="font-size: 13px; font-weight: 700; background: var(--primary-light); color: var(--primary-dark);">Allocation Found</span>
+            <h2 style="font-size: 24px; font-weight: 700; color: var(--primary-dark); margin-top: 6px;" th:text="${student.studentName}">Student Name</h2>
+            <p style="font-size: 14px; color: var(--text-secondary);" th:text="${'Register No: ' + student.registerNumber}">RegNo</p>
+        </div>
+
+        <div class="result-grid">
+            <div class="result-item">
+                <div class="result-item-label">Academic Class</div>
+                <div class="result-item-value" th:text="${student.className}">B.Tech AI&DS</div>
+            </div>
+
+            <div class="result-item">
+                <div class="result-item-label">Section</div>
+                <div class="result-item-value" th:text="${student.section}">A</div>
+            </div>
+
+            <div class="result-item">
+                <div class="result-item-label">Exam Hall</div>
+                <div class="result-item-value" th:text="${allocation.hall.hallName}">A101</div>
+            </div>
+
+            <div class="result-item">
+                <div class="result-item-label">Assigned Seat</div>
+                <div class="result-item-value" th:text="${allocation.seatNumber}" style="color: var(--primary-color);">A101-R3-C4</div>
+            </div>
+
+            <div class="result-item">
+                <div class="result-item-label">Row Number</div>
+                <div class="result-item-value" th:text="${'Row ' + allocation.rowNum}">Row 3</div>
+            </div>
+
+            <div class="result-item">
+                <div class="result-item-label">Column Number</div>
+                <div class="result-item-value" th:text="${'Column ' + allocation.colNum}">Column 4</div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="app-footer">
+    <p>SeatPlan &mdash; Exam Hall Seating Arrangement Generator &copy; 2026</p>
+</footer>
+
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

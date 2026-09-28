@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head></head>
+<body>
+<header th:fragment="appHeader(activeTab)" class="app-header">
+    <div class="header-container">
+        <div class="nav-brand-left">
+            <a th:href="@{/dashboard}" class="nav-title">
+                <span class="brand-title">SeatPlan</span>
+            </a>
+            <nav class="main-nav">
+                <a th:href="@{/dashboard}" th:classappend="${activeTab == 'dashboard' ? 'active' : ''}">📊 Dashboard</a>
+                <a th:href="@{/halls}" th:classappend="${activeTab == 'halls' ? 'active' : ''}">🏛️ Exam Halls</a>
+                <a th:href="@{/students}" th:classappend="${activeTab == 'students' ? 'active' : ''}">👨‍🎓 Students</a>
+                <a th:href="@{/seating}" th:classappend="${activeTab == 'seating' ? 'active' : ''}">🪑 Seating Chart</a>
+                <a th:href="@{/find-seat}" th:classappend="${activeTab == 'find-seat' ? 'active' : ''}">🔍 Find Student</a>
+            </nav>
+        </div>
+
+        <!-- Mandatory TOP-RIGHT Branding -->
+        <div class="header-right">
+            <div class="top-right-branding">
+                <span class="branding-name">SeatPlan</span>
+                <span class="branding-tagline">Exam Hall Seating Generator</span>
+            </div>
+            <a th:href="@{/logout}" class="btn-logout" title="Sign Out">Logout 🚪</a>
+        </div>
+    </div>
+</header>
+</body>
+</html>

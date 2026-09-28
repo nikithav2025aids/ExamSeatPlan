@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Halls - SeatPlan</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/header :: appHeader(${activeTab})}"></div>
+
+<main class="main-container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Exam Hall Management</h1>
+            <p class="page-subtitle">Configure examination halls, grid dimensions, and student capacities</p>
+        </div>
+    </div>
+
+    <!-- Alert Notifications -->
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+    <div class="content-grid">
+        <!-- Add Hall Form Card -->
+        <div class="form-card">
+            <h2 class="form-title" id="formTitle">Add New Exam Hall</h2>
+            <form th:action="@{/halls/add}" th:object="${hall}" method="post" id="hallForm">
+                <input type="hidden" id="hallId" th:field="*{id}">
+
+                <div class="form-group">
+                    <label for="hallName" class="form-label">Hall Name</label>
+                    <input type="text" id="hallName" th:field="*{hallName}" class="form-control" placeholder="e.g. A101" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="rowsCount" class="form-label">Rows</label>
+                    <input type="number" id="rowsCount" th:field="*{rows}" class="form-control" placeholder="e.g. 5" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="columnsCount" class="form-label">Columns</label>
+                    <input type="number" id="columnsCount" th:field="*{columns}" class="form-control" placeholder="e.g. 6" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="capacity" class="form-label">Seating Capacity</label>
+                    <input type="number" id="capacity" th:field="*{capacity}" class="form-control" placeholder="e.g. 30 (Max: Rows × Cols)" min="1" required>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" id="submitBtn" class="btn btn-primary" style="flex: 1;">Save Hall</button>
+                    <button type="button" id="cancelBtn" class="btn btn-secondary" onclick="resetHallForm()" style="display: none;">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Halls List Table -->
+        <div class="table-card">
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Hall Name</th>
+                        <th>Rows</th>
+                        <th>Columns</th>
+                        <th>Max Grid</th>
+                        <th>Capacity</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(halls)}">
+                        <td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 30px;">
+                            No exam halls registered yet. Add your first hall using the form.
+                        </td>
+                    </tr>
+                    <tr th:each="h, stat : ${halls}">
+                        <td th:text="${stat.count}">1</td>
+                        <td th:text="${h.hallName}" style="font-weight: 700; color: var(--primary-dark);">A101</td>
+                        <td th:text="${h.rows}">5</td>
+                        <td th:text="${h.columns}">6</td>
+                        <td th:text="${h.rows * h.columns}">30</td>
+                        <td>
+                            <span class="seat-class-badge" style="font-size: 13px; font-weight: 700;" th:text="${h.capacity}">30</span>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-secondary btn-sm"
+                                        th:onclick="editHall([[${h.id}]], [[${h.hallName}]], [[${h.rows}]], [[${h.columns}]], [[${h.capacity}]])">
+                                    ✏️ Edit
+                                </button>
+                                <form th:action="@{'/halls/delete/' + ${h.id}}" method="post" onsubmit="return confirmDelete('hall ' + [[${h.hallName}]])" style="display: inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm">🗑️ Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="app-footer">
+    <p>SeatPlan &mdash; Exam Hall Seating Arrangement Generator &copy; 2026</p>
+</footer>
+
+<script th:src="@{/js/app.js}"></script>
+<script>
+    function editHall(id, name, rows, cols, capacity) {
+        document.getElementById('formTitle').innerText = 'Edit Exam Hall';
+        document.getElementById('hallForm').action = '/halls/edit/' + id;
+        document.getElementById('hallId').value = id;
+        document.getElementById('hallName').value = name;
+        document.getElementById('rowsCount').value = rows;
+        document.getElementById('columnsCount').value = cols;
+        document.getElementById('capacity').value = capacity;
+        document.getElementById('submitBtn').innerText = 'Update Hall';
+        document.getElementById('cancelBtn').style.display = 'inline-flex';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetHallForm() {
+        document.getElementById('formTitle').innerText = 'Add New Exam Hall';
+        document.getElementById('hallForm').action = '/halls/add';
+        document.getElementById('hallId').value = '';
+        document.getElementById('hallName').value = '';
+        document.getElementById('rowsCount').value = '';
+        document.getElementById('columnsCount').value = '';
+        document.getElementById('capacity').value = '';
+        document.getElementById('submitBtn').innerText = 'Save Hall';
+        document.getElementById('cancelBtn').style.display = 'none';
+    }
+</script>
+</body>
+</html>
